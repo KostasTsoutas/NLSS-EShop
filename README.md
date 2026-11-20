@@ -48,31 +48,6 @@
 
 Άκυρη επιλογή μενού τυπώνει `Not a valid option.` Άκυρος κωδικός προϊόντος τυπώνει `Invalid ID.`
 
-```mermaid
-flowchart TD
-    A["main: φόρτωση αρχείων"] --> B["showMenu"]
-    B --> C{"Επιλογή 1 ως 10"}
-    C -->|1| D["showCatalog"]
-    C -->|2| E["add_product_to_cart"]
-    C -->|3| F["remove_product_from_cart"]
-    C -->|4| G["showCart"]
-    C -->|5| H["clearCart"]
-    C -->|6| I["add_product_to_catalog"]
-    C -->|7| J["checkout"]
-    C -->|8| K["showHistory"]
-    C -->|9| L["Στοιχεία εταιρείας"]
-    C -->|10| M["Αποθήκευση και έξοδος"]
-    D --> B
-    E --> B
-    F --> B
-    G --> B
-    H --> B
-    I --> B
-    J --> B
-    K --> B
-    L --> B
-```
-
 ## Τιμές, εκπτώσεις, μεταφορικά
 
 Κάθε προϊόν ανήκει σε μία από τέσσερις κατηγορίες. Στην ολοκλήρωση αγοράς η `Orders.checkout` αφαιρεί το ποσοστό της κατηγορίας από κάθε τεμάχιο.
