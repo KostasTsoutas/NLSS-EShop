@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1280px; height: 420px; overflow: hidden; background: #102033; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #f7f3ea;
+    background:
+      radial-gradient(900px 280px at 100% 0%, rgba(46, 140, 150, 0.35), transparent 60%),
+      linear-gradient(115deg, #0d1b2e 0%, #16324f 58%, #1d4e5a 100%);
+    padding: 54px 68px 46px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .eyebrow {
+    color: #e6c98a;
+    letter-spacing: 0.34em;
+    font-size: 15px;
+    font-weight: 650;
+  }
+  h1 {
+    font-size: 78px;
+    line-height: 0.95;
+    letter-spacing: -1.5px;
+    font-weight: 720;
+    margin-top: 18px;
+  }
+  .sub {
+    margin-top: 14px;
+    font-size: 28px;
+    color: #d5e2ee;
+    font-weight: 450;
+  }
+  .row {
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    color: #f7f3ea;
+    font-size: 18px;
+  }
+  .row span { opacity: 0.95; }
+  .dot { width: 5px; height: 5px; border-radius: 50%; background: #e6c98a; display: inline-block; }
+</style>
+</head>
+<body>
+  <div>
+    <div class="eyebrow">JAVA · ΣΑΕΚ · Γ' ΕΞΑΜΗΝΟ</div>
+    <h1>NLSS E-Shop</h1>
+    <div class="sub">Ηλεκτρονικό κατάστημα σε κονσόλα</div>
+  </div>
+  <div class="row">
+    <span>Κατάλογος</span><i class="dot"></i>
+    <span>Καλάθι</span><i class="dot"></i>
+    <span>Εκπτώσεις</span><i class="dot"></i>
+    <span>Ιστορικό αγορών</span><i class="dot"></i>
+    <span>Αποθήκευση σε αρχεία</span>
+  </div>
+</body>
+</html>

@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<title>NLSS E-Shop — Παράδειγμα εκτέλεσης</title>
+<style>
+  @page {
+    size: A4;
+    margin: 16mm 15mm 18mm 15mm;
+    @bottom-center {
+      content: counter(page);
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: 10px;
+      color: #6d6458;
+    }
+  }
+  @page :first { margin: 0; @bottom-center { content: none; } }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: white;
+    color: #1c2430;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 11pt;
+    line-height: 1.48;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  h1, h2, h3, h4 { font-weight: 680; letter-spacing: -0.01em; margin: 0; }
+  p { margin: 0 0 8px; }
+  code, .mono {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.86em;
+  }
+
+  .cover {
+    height: 297mm;
+    background:
+      radial-gradient(900px 420px at 100% 0%, rgba(46, 140, 150, 0.38), transparent 62%),
+      linear-gradient(160deg, #0d1b2e 0%, #16324f 55%, #1a4c58 100%);
+    color: #f7f3ea;
+    padding: 28mm 20mm 18mm;
+    display: flex;
+    flex-direction: column;
+  }
+  .cover .eyebrow {
+    color: #e6c98a;
+    letter-spacing: 0.32em;
+    font-size: 12px;
+    font-weight: 680;
+  }
+  .cover h1 {
+    font-size: 58px;
+    line-height: 0.95;
+    margin-top: 22px;
+    letter-spacing: -1.4px;
+  }
+  .cover .subtitle {
+    margin-top: 16px;
+    font-size: 22px;
+    color: #d7e4ef;
+    max-width: 150mm;
+  }
+  .cover .rule {
+    width: 72px;
+    height: 3px;
+    background: #e6c98a;
+    margin: 26px 0 18px;
+    border: 0;
+  }
+  .cover .lead { font-size: 15px; line-height: 1.55; max-width: 155mm; color: #f3efe6; }
+  .cover .grow { flex: 1; }
+  .meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px 18px;
+    border-top: 1px solid rgba(255,255,255,0.22);
+    padding-top: 16px;
+  }
+  .meta span { display: block; color: #e6c98a; font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 3px; }
+  .meta strong { font-weight: 600; font-size: 14px; }
+
+  .page { page-break-before: always; }
+  h2.sec {
+    font-size: 22px;
+    color: #16324f;
+    border-bottom: 2px solid #e6c98a;
+    padding-bottom: 6px;
+    margin: 0 0 12px;
+  }
+  h3 {
+    font-size: 13px;
+    color: #0f6e78;
+    margin: 12px 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .step { page-break-before: always; }
+  .step-head {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .num {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #16324f;
+    color: #f7f3ea;
+    font-weight: 720;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .kicker {
+    color: #8a6a2f;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 680;
+    margin-bottom: 2px;
+  }
+  .step-head h2 { font-size: 20px; color: #16324f; line-height: 1.2; }
+
+  .prompt {
+    background: #142033;
+    color: #f6f1e6;
+    border-radius: 8px;
+    padding: 9px 12px;
+    white-space: pre-wrap;
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 9.4pt;
+    line-height: 1.5;
+    margin: 0 0 8px;
+  }
+  .note, .math, .did {
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin: 0 0 8px;
+  }
+  .note { background: #eef5f5; border-left: 4px solid #0f6e78; }
+  .math { background: #fbf6ea; border-left: 4px solid #b0893e; }
+  .did { background: #f4f6f8; border-left: 4px solid #16324f; }
+
+  table { width: 100%; border-collapse: collapse; margin: 4px 0 10px; }
+  th, td { text-align: left; vertical-align: top; padding: 5px 8px; border-bottom: 1px solid #e7e1d6; }
+  th { background: #16324f; color: #f7f3ea; font-size: 10pt; font-weight: 640; }
+  td:first-child { width: 42%; color: #16324f; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.7pt; }
+  tr { break-inside: avoid; }
+
+  figure.shot { margin: 8px 0 4px; text-align: center; break-inside: avoid; }
+  figure.shot img {
+    max-width: 100%;
+    max-height: 148mm;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    border: 1px solid #d9d3c7;
+  }
+  figcaption { color: #6d6458; font-size: 9.5pt; margin-top: 4px; }
+
+  ol.clean { margin: 6px 0 10px; padding-left: 18px; }
+  ol.clean li { margin: 0 0 4px; }
+  .small td, .small th { font-size: 9.4pt; padding: 4px 7px; }
+  .small td:first-child { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.3pt; }
+  .two { width: 100%; }
+  .muted { color: #5c6770; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="eyebrow">ΣΑΕΚ · Γ' ΕΞΑΜΗΝΟ · JAVA</div>
+  <h1>NLSS<br>E-Shop</h1>
+  <p class="subtitle">Παράδειγμα εκτέλεσης, βήμα προς βήμα.</p>
+  <hr class="rule">
+  <p class="lead">
+    Σε κάθε βήμα γράφεται τι ζητάει το πρόγραμμα, τι δόθηκε σε αυτή την εκτέλεση
+    και ποιες συναρτήσεις καλούνται, μαζί με το τι κάνει η καθεμιά.
+    Τα στιγμιότυπα είναι από μία πραγματική εκτέλεση της εφαρμογής.
+  </p>
+  <div class="grow"></div>
+  <div class="meta">
+    <div><span>Σπουδαστής</span><strong>TSOUTAS KONSTANTINOS</strong></div>
+    <div><span>Εφαρμογή</span><strong>Next Level Shopping Solutions</strong></div>
+    <div><span>Είδος</span><strong>Εφαρμογή κονσόλας σε Java</strong></div>
+    <div><span>Αρχείο πηγαίου κώδικα</span><strong>Main.java</strong></div>
+  </div>
+</section>
+
+<section class="page">
+  <h2 class="sec">Πώς διαβάζεται αυτό το έγγραφο</h2>
+  <p>
+    Το πρόγραμμα μιλάει στον χρήστη στα αγγλικά. Οι ερωτήσεις του παρατίθενται αυτολεξεί,
+    σε σκούρο πλαίσιο. Από κάτω γράφεται τι πληκτρολογήθηκε στο παράδειγμα και ποιες
+    συναρτήσεις έτρεξαν για να βγει η οθόνη του στιγμιότυπου.
+  </p>
+  <p>
+    Όλες οι κλάσεις βρίσκονται στο αρχείο <span class="mono">Main.java</span>.
+    Το μενού το χειρίζεται η <span class="mono">Main.showMenu</span>. Σε κάθε επιλογή
+    καλεί μία συνάρτηση και, όταν εκείνη τελειώσει, ξανατυπώνει το μενού.
+  </p>
+
+  <h3>Το σενάριο της εκτέλεσης</h3>
+  <ol class="clean">
+    <li>Εκκίνηση και φόρτωση καταλόγου, ιστορικού και καλαθιού.</li>
+    <li>Προβολή του καταλόγου.</li>
+    <li>Προσθήκη δύο Lenovo ThinkPad T70 στο καλάθι.</li>
+    <li>Αφαίρεση ενός τεμαχίου. Μένει ένα, σύνολο 2.300 €.</li>
+    <li>Προβολή καλαθιού και εκκένωσή του.</li>
+    <li>Δημιουργία του Samsung Galaxy S25 Ultra και έλεγχος ότι μπήκε στον κατάλογο.</li>
+    <li>Νέο καλάθι με ένα Galaxy και ένα ThinkPad, ολοκλήρωση αγοράς, κωδικός προσφοράς.</li>
+    <li>Προβολή ιστορικού, στοιχεία εταιρείας, αποθήκευση και έξοδος.</li>
+  </ol>
+
+  <h3>Εκπτώσεις που εφαρμόζει η ολοκλήρωση αγοράς</h3>
+  <table>
+    <thead><tr><th>Κατηγορία</th><th>Ποσοστό που αφαιρείται από κάθε τεμάχιο</th></tr></thead>
+    <tbody>
+      <tr><td>Clothes</td><td>5%</td></tr>
+      <tr><td>Electronics</td><td>10%</td></tr>
+      <tr><td>Food/Drinks</td><td>2%</td></tr>
+      <tr><td>Misc</td><td>1%</td></tr>
+    </tbody>
+  </table>
+  <div class="note">
+    Τα μεταφορικά είναι 0,95 € ανά κιλό. Μηδενίζονται όταν το σύνολο, μετά τις εκπτώσεις
+    κατηγορίας, ξεπερνά τα 1.000 €. Ο κωδικός <span class="mono">M3T4M0RF0S1</span> έχει τιμή 15.
+    Η <span class="mono">checkout</span> διαιρεί τότε το ποσό με 1,15.
+  </div>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">01</div>
+    <div>
+      <div class="kicker">Εκκίνηση</div>
+      <h2>Φόρτωση δεδομένων και κεντρικό μενού</h2>
+    </div>
+  </div>
+  <p>
+    Η εκτέλεση ξεκινά από τη <span class="mono">main</span>. Πριν εμφανιστεί το μενού,
+    το πρόγραμμα διαβάζει τρία αρχεία και τυπώνει τη διαδρομή του καθενός.
+  </p>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>
+    Πριν από την ερώτηση έχει ήδη τυπώσει τις δέκα επιλογές του μενού και τον τίτλο
+    <span class="mono">__|| NLSS E-Shop ||__</span>.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Ο χρήστης δεν έχει διαλέξει ακόμη επιλογή. Η οθόνη επιβεβαιώνει ότι φορτώθηκαν
+    ο κατάλογος, το ιστορικό αγορών και το καλάθι.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.main</td><td>Δημιουργεί τα αντικείμενα της εφαρμογής, ορίζει τα ονόματα των αρχείων και ξεκινά τη φόρτωση.</td></tr>
+      <tr><td>Catalog.restoreCatalog</td><td>Ανοίγει το Data/catalog.txt. Κάθε μπλοκ που αρχίζει με __New_Item__ γίνεται προϊόν.</td></tr>
+      <tr><td>new Product</td><td>Αποθηκεύει όνομα, κατηγορία, βάρος και τιμή, και δίνει τον επόμενο κωδικό, ξεκινώντας από το 1.</td></tr>
+      <tr><td>Catalog.addProduct</td><td>Βάζει το νέο προϊόν στη λίστα του καταλόγου.</td></tr>
+      <tr><td>new Cart</td><td>Φτιάχνει άδειο καλάθι συνδεδεμένο με αυτόν τον κατάλογο.</td></tr>
+      <tr><td>Orders.restoreHistory</td><td>Διαβάζει το Data/historyLog.txt και ξαναφτιάχνει τις παλιές αγορές.</td></tr>
+      <tr><td>RestoreOrderHistoryObject</td><td>Μετατρέπει τον κωδικό και την ποσότητα μιας γραμμής του αρχείου από κείμενο σε ακέραιους.</td></tr>
+      <tr><td>Cart.addProduct</td><td>Γεμίζει το καλάθι της παλιάς αγοράς με τα προϊόντα και τις ποσότητες του αρχείου.</td></tr>
+      <tr><td>new History</td><td>Κρατά την ημερομηνία, το τελικό ποσό και ένα αντίγραφο εκείνου του καλαθιού.</td></tr>
+      <tr><td>Cart.copy</td><td>Φτιάχνει το αντίγραφο, ώστε μια αλλαγή στο τρέχον καλάθι να μην πειράζει το ιστορικό.</td></tr>
+      <tr><td>Cart.restoreCart</td><td>Διαβάζει το Data/cartLog.txt και ξαναβάζει στο ανοιχτό καλάθι ένα τεμάχιο για κάθε αποθηκευμένο κωδικό.</td></tr>
+      <tr><td>Main.showMenu</td><td>Τυπώνει το μενού και περιμένει ακέραιο από το 1 έως το 10.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/01-ekkinisi.jpg" alt="Φόρτωση αρχείων και κεντρικό μενού">
+    <figcaption>Εικόνα 1. Επιτυχής φόρτωση και το μενού που ζητάει επιλογή.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">02</div>
+    <div>
+      <div class="kicker">Επιλογή 1</div>
+      <h2>Προβολή καταλόγου</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>
+    Δεν κάνει άλλη ερώτηση. Με την επιλογή 1 τυπώνει τον κατάλογο και επιστρέφει στο μενού.
+    Σε αυτή την προβολή δεν εμφανίζονται κωδικοί προϊόντων.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Δόθηκε η επιλογή <strong>1</strong>. Στην οθόνη φαίνονται, ανάμεσα σε άλλα, τα ρούχα της αρχής του καταλόγου και το Lenovo ThinkPad T70 με τιμή 2300.0€, κατηγορία Electronics και βάρος 800g.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Διαβάζει την επιλογή 1 και μπαίνει στην αντίστοιχη περίπτωση του switch.</td></tr>
+      <tr><td>Catalog.showCatalog(false)</td><td>Διατρέχει τα προϊόντα και τυπώνει όνομα, τιμή, κατηγορία και βάρος. Η παράμετρος false κρύβει το Id.</td></tr>
+      <tr><td>Product.getName</td><td>Επιστρέφει το όνομα που τυπώνεται πρώτο σε κάθε προϊόν.</td></tr>
+      <tr><td>Product.getPrice</td><td>Επιστρέφει την τιμή. Εδώ τυπώνεται ως αριθμός ακολουθούμενος από €.</td></tr>
+      <tr><td>Product.getCategory</td><td>Επιστρέφει την κατηγορία, για παράδειγμα Clothes ή Electronics.</td></tr>
+      <tr><td>Product.getWeight</td><td>Επιστρέφει το βάρος σε γραμμάρια. Πάνω από 1000 γραμμάρια η προβολή το μετατρέπει σε κιλά.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/02-katalogos.jpg" alt="Κατάλογος χωρίς κωδικούς">
+    <figcaption>Εικόνα 2. Τμήμα του καταλόγου, όπως τον τυπώνει η επιλογή 1.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">03</div>
+    <div>
+      <div class="kicker">Επιλογή 2</div>
+      <h2>Κατάλογος για προσθήκη στο καλάθι</h2>
+    </div>
+  </div>
+  <p>
+    Η προσθήκη δεν γίνεται με το όνομα. Ο χρήστης διαλέγει κωδικό, γι’ αυτό ο κατάλογος
+    τυπώνεται ξανά, αυτή τη φορά με Id και με την ποσότητα που βρίσκεται ήδη στο καλάθι.
+  </p>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:
+Input id of the product or type 'Exit' to go back:</div>
+  <p>Η λέξη <span class="mono">Exit</span> διακόπτει τον διάλογο και γυρίζει στο μενού. Η σύγκριση δεν κοιτάζει κεφαλαία και πεζά.</p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Δόθηκε η επιλογή <strong>2</strong>. Το ThinkPad εμφανίζεται με <span class="mono">Id: 6</span> και <span class="mono">(In cart: 0)</span>, γιατί το καλάθι δεν το περιέχει ακόμη.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 2.</td></tr>
+      <tr><td>Main.add_product_to_cart</td><td>Ανοίγει τον διάλογο προσθήκης και επαναλαμβάνει την ερώτηση του κωδικού μέχρι να δοθεί Exit.</td></tr>
+      <tr><td>Catalog.showCartCatalog(true, cart, false)</td><td>Τυπώνει όλα τα προϊόντα. Η πρώτη παράμετρος εμφανίζει το Id. Η τρίτη, false, σημαίνει ότι δεν γίνεται αφαίρεση, άρα δεν κρύβεται κανένα προϊόν.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Μετράει πόσα τεμάχια αυτού του κωδικού υπάρχουν ήδη στο καλάθι. Η τιμή μπαίνει στη γραμμή In cart.</td></tr>
+      <tr><td>Product.getId</td><td>Δίνει τον κωδικό που τυπώνεται κάτω από το όνομα.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/03-prosthiki.jpg" alt="Κατάλογος με κωδικούς και ποσότητα καλαθιού">
+    <figcaption>Εικόνα 3. Ο κατάλογος της προσθήκης. Τα ρούχα έχουν ακόμη μηδενική ποσότητα στο καλάθι.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">04</div>
+    <div>
+      <div class="kicker">Επιλογή 2, συνέχεια</div>
+      <h2>Εισαγωγή κωδικού και ποσότητας</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input id of the product or type 'Exit' to go back:
+ID: 6 matched with product Lenovo ThinkPad T70
+Please input quantity:</div>
+  <p>
+    Αν ο κωδικός δεν αντιστοιχεί σε προϊόν, τυπώνει <span class="mono">Invalid ID.</span> και ξαναρωτάει.
+    Η ποσότητα περνά από <span class="mono">Math.abs</span>, ώστε αρνητικός αριθμός να μετράει ως θετικός.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Δόθηκε κωδικός <strong>6</strong> και ποσότητα <strong>2</strong>.
+    Το πρόγραμμα επιβεβαιώνει ότι προστέθηκε το Lenovo ThinkPad T70 επί δύο, με τιμή μονάδας 2300.0€.
+    Το νέο σύνολο του καλαθιού είναι 4600.0. Η ερώτηση του κωδικού εμφανίζεται ξανά, για επόμενο προϊόν ή για Exit.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Catalog.getProducts</td><td>Δίνει τη λίστα στην οποία ψάχνει ο διάλογος τον κωδικό που πληκτρολογήθηκε.</td></tr>
+      <tr><td>Product.getId</td><td>Συγκρίνεται με το κείμενο που έδωσε ο χρήστης. Το 6 ταιριάζει με το ThinkPad.</td></tr>
+      <tr><td>Product.getName</td><td>Δίνει το όνομα που μπαίνει στο μήνυμα επιβεβαίωσης.</td></tr>
+      <tr><td>Cart.addProduct(6, 2)</td><td>Βρίσκει το προϊόν με κωδικό 6 και το προσθέτει στη λίστα του καλαθιού δύο φορές.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Μετά την προσθήκη επιστρέφει 2, οπότε το μήνυμα γράφει (x2) και όχι τη φράση της μονής προσθήκης.</td></tr>
+      <tr><td>Product.getPrice</td><td>Δίνει την τιμή μονάδας, 2300.0, που τυπώνεται στην επιβεβαίωση.</td></tr>
+      <tr><td>Cart.getTotalPrice</td><td>Αθροίζει τις τιμές των τεμαχίων του καλαθιού. Δύο φορές 2300 δίνουν 4600.0.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/04-posotita.png" alt="Το πρόγραμμα ζητάει ποσότητα">
+    <figcaption>Εικόνα 4. Ο κωδικός 6 αναγνωρίστηκε και ζητείται ποσότητα.</figcaption>
+  </figure>
+  <figure class="shot">
+    <img src="../screenshots/05-prosthiki-apotelesma.png" alt="Επιβεβαίωση προσθήκης δύο τεμαχίων">
+    <figcaption>Εικόνα 5. Δύο τεμάχια μπήκαν στο καλάθι. Σύνολο 4600.0.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">05</div>
+    <div>
+      <div class="kicker">Επιλογή 3</div>
+      <h2>Κατάλογος μόνο με όσα είναι στο καλάθι</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:
+Input id of the product or type 'Exit' to go back:</div>
+  <p>Η ερώτηση είναι ίδια με της προσθήκης. Διαφορετικός είναι ο κατάλογος που έχει τυπωθεί από πάνω: λείπουν τα προϊόντα με μηδενική ποσότητα.</p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Δόθηκε η επιλογή <strong>3</strong>. Φαίνεται μόνο το Lenovo ThinkPad T70, με <span class="mono">(In cart: 2)</span>.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 3.</td></tr>
+      <tr><td>Main.remove_product_from_cart</td><td>Ανοίγει τον διάλογο αφαίρεσης και μένει σε αυτόν μέχρι να δοθεί Exit.</td></tr>
+      <tr><td>Catalog.showCartCatalog(true, cart, true)</td><td>Τυπώνει κατάλογο με κωδικούς. Η τρίτη παράμετρος, true, λέει ότι ο χρήστης αφαιρεί, οπότε προϊόν με ποσότητα μικρότερη του 1 παραλείπεται.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Χρησιμοποιείται και για το φίλτρο και για τη γραμμή In cart. Εδώ επιστρέφει 2.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/06-afairesi.png" alt="Κατάλογος αφαίρεσης με το ThinkPad δύο φορές στο καλάθι">
+    <figcaption>Εικόνα 6. Στην αφαίρεση ο κατάλογος περιορίζεται σε ό,τι υπάρχει ήδη στο καλάθι.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">06</div>
+    <div>
+      <div class="kicker">Επιλογή 3, συνέχεια</div>
+      <h2>Αφαίρεση ποσότητας</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input id of the product or type 'Exit' to go back:
+ID: 6 matched with product Lenovo ThinkPad T70
+Please input quantity you wish to remove:</div>
+  <p>
+    Αν η ποσότητα είναι μεγαλύτερη από όσα τεμάχια υπάρχουν, αφαιρούνται όλα και το μήνυμα γίνεται
+    <span class="mono">All quantities of the product removed from the cart</span>.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Δόθηκε κωδικός <strong>6</strong> και ποσότητα <strong>1</strong>.
+    Η οθόνη γράφει ότι αφαιρέθηκε 1 τεμάχιο, έμεινε 1, και το νέο σύνολο είναι 2300.0€.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Product.getId</td><td>Επιβεβαιώνει ότι το 6 είναι το ThinkPad και ότι αυτό υπάρχει στο καλάθι.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Πριν από την αφαίρεση κρατά την παλιά ποσότητα, ώστε το μήνυμα να ξέρει αν αδειάζει το προϊόν.</td></tr>
+      <tr><td>Cart.removeProduct(6, 1)</td><td>Περιορίζει την ποσότητα σε όσα υπάρχουν και αφαιρεί ένα τεμάχιο του κωδικού 6 από τη λίστα.</td></tr>
+      <tr><td>Product.getName</td><td>Δίνει το όνομα στο μήνυμα της αφαίρεσης.</td></tr>
+      <tr><td>Cart.getTotalPrice</td><td>Ξαναϋπολογίζει το σύνολο. Ένα τεμάχιο των 2300 δίνει 2300.0.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/07-afairesi-posotita.png" alt="Ζητείται η ποσότητα που θα αφαιρεθεί">
+    <figcaption>Εικόνα 7. Ζητείται πόσα τεμάχια θα βγουν από το καλάθι. Δόθηκε 1.</figcaption>
+  </figure>
+  <figure class="shot">
+    <img src="../screenshots/08-afairesi-apotelesma.png" alt="Έμεινε ένα ThinkPad, σύνολο 2300">
+    <figcaption>Εικόνα 8. Ένα τεμάχιο αφαιρέθηκε. Μένει ένα και το σύνολο είναι 2300.0€.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">07</div>
+    <div>
+      <div class="kicker">Επιλογή 4</div>
+      <h2>Προβολή προϊόντων του καλαθιού</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>
+    Δεν ζητάει κωδικό ούτε ποσότητα. Τυπώνει την επικεφαλίδα
+    <span class="mono">||Products in cart||</span>, μετά τα προϊόντα και το σύνολο, και γυρίζει στο μενού.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Δόθηκε η επιλογή <strong>4</strong>. Φαίνεται ένα Lenovo ThinkPad T70, ποσότητα 1,
+    τιμή <strong>2.300,00 €</strong> και το ίδιο ποσό ως σύνολο. Η τελεία των χιλιάδων και το κόμμα των δεκαδικών έρχονται από τη γερμανική μορφοποίηση νομίσματος.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 4 και τυπώνει την επικεφαλίδα του καλαθιού.</td></tr>
+      <tr><td>Cart.showCart</td><td>Μαζεύει τα διαφορετικά προϊόντα και τυπώνει το καθένα μία φορά, με ποσότητα και τιμή.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Δίνει την ποσότητα. Εδώ είναι 1, οπότε η τιμή τυπώνεται μία φορά και όχι ως πολλαπλασιασμός.</td></tr>
+      <tr><td>Product.getName / getPrice</td><td>Δίνουν το όνομα και την τιμή μονάδας που μορφοποιείται σε ευρώ.</td></tr>
+      <tr><td>Cart.getTotalPrice</td><td>Δίνει το σύνολο που τυπώνεται στη γραμμή Total price.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/09-kalathi.png" alt="Καλάθι με ένα ThinkPad">
+    <figcaption>Εικόνα 9. Το καλάθι μετά την αφαίρεση του ενός τεμαχίου.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">08</div>
+    <div>
+      <div class="kicker">Επιλογή 5</div>
+      <h2>Εκκένωση καλαθιού</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:
+Type 'Yes' to clear cart.</div>
+  <p>
+    Μόνο η απάντηση <span class="mono">Yes</span>, χωρίς διάκριση κεφαλαίων, αδειάζει το καλάθι
+    και τυπώνει <span class="mono">Cart cleared successfully.</span>
+    Οποιαδήποτε άλλη απάντηση τυπώνει <span class="mono">No changes were made.</span>
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Δόθηκε η επιλογή <strong>5</strong> και στην επιβεβαίωση πληκτρολογήθηκε <strong>Yes</strong>.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 5.</td></tr>
+      <tr><td>Cart.clearCart</td><td>Τυπώνει την ερώτηση, διαβάζει μία γραμμή και, αν είναι Yes, καλεί clear στη λίστα του καλαθιού.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/10-ekkenosi.png" alt="Επιβεβαίωση εκκένωσης">
+    <figcaption>Εικόνα 10. Η επιλογή 5 και η ερώτηση επιβεβαίωσης, με απάντηση Yes.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">09</div>
+    <div>
+      <div class="kicker">Επιλογή 6</div>
+      <h2>Δημιουργία νέου προϊόντος</h2>
+    </div>
+  </div>
+  <p>Το νέο προϊόν μπαίνει στον κατάλογο. Δεν μπαίνει αυτόματα στο καλάθι.</p>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:
+Input name of the product you wish to add or type 'Exit' to go back:
+Choose a category:
+1. Clothes
+2. Electronics
+3. Food/Drinks
+4. Misc
+Input price:
+Input weight (g):
+Do you wish to proceed? (Yes/No):</div>
+  <p>
+    Αν το όνομα υπάρχει ήδη, τυπώνει <span class="mono">Product with that name already exists.</span> και δεν προχωρά.
+    Με <span class="mono">No</span> στην τελευταία ερώτηση το προϊόν δεν καταχωρίζεται.
+    Με <span class="mono">Yes</span>, το προσθέτει και ρωτάει
+    <span class="mono">Do you wish to create a new product? (Yes/No):</span>.
+    Απάντηση <span class="mono">No</span> κλείνει τον διάλογο.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Όνομα <strong>Samsung Galaxy S25 Ultra</strong>, κατηγορία <strong>2</strong> (Electronics),
+    τιμή <strong>1900</strong>, βάρος <strong>150</strong> γραμμάρια.
+    Η σύνοψη δείχνει την τιμή ως 1.900,00 € και το βάρος ως 150g. Η καταχώριση επιβεβαιώνεται από το επόμενο βήμα, όπου το προϊόν υπάρχει στον κατάλογο.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 6.</td></tr>
+      <tr><td>Main.add_product_to_catalog</td><td>Ζητάει τα τέσσερα στοιχεία, ελέγχει αν το όνομα υπάρχει, δείχνει τη σύνοψη και περιμένει Yes ή No.</td></tr>
+      <tr><td>Catalog.getProducts / Product.getName</td><td>Χρησιμοποιούνται για να μην καταχωριστεί δεύτερη φορά το ίδιο όνομα.</td></tr>
+      <tr><td>new Product</td><td>Με την επιβεβαίωση δημιουργεί το προϊόν και του δίνει τον επόμενο ελεύθερο κωδικό.</td></tr>
+      <tr><td>Catalog.addProduct</td><td>Το προσθέτει στη λίστα του καταλόγου. Η αποθήκευση στο αρχείο γίνεται αργότερα, στην έξοδο.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/11-neo-proion.png" alt="Σύνοψη του Samsung Galaxy S25 Ultra">
+    <figcaption>Εικόνα 11. Σύνοψη πριν από την ερώτηση Do you wish to proceed?</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">10</div>
+    <div>
+      <div class="kicker">Επιλογή 1, μετά τη δημιουργία</div>
+      <h2>Το νέο προϊόν μέσα στον κατάλογο</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>Ίδια ερώτηση με το βήμα 2. Η διαφορά είναι το περιεχόμενο του καταλόγου: στο τέλος του υπάρχει πλέον το προϊόν που μόλις δημιουργήθηκε.</p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Ο κατάλογος δείχνει το Samsung Galaxy S25 Ultra με τιμή 1900.0€, κατηγορία Electronics και βάρος 150g.
+    Η μορφή της τιμής είναι εκείνη της <span class="mono">showCatalog</span>, όχι η μορφοποιημένη σύνοψη της δημιουργίας.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Catalog.showCatalog(false)</td><td>Ξανατυπώνει όλον τον κατάλογο, μαζί με το προϊόν που πρόσθεσε η addProduct.</td></tr>
+      <tr><td>Product.getName</td><td>Επιστρέφει Samsung Galaxy S25 Ultra.</td></tr>
+      <tr><td>Product.getPrice</td><td>Επιστρέφει 1900, που τυπώνεται ως 1900.0€.</td></tr>
+      <tr><td>Product.getCategory</td><td>Επιστρέφει Electronics, την κατηγορία που αντιστοιχεί στην επιλογή 2.</td></tr>
+      <tr><td>Product.getWeight</td><td>Επιστρέφει 150. Επειδή δεν ξεπερνά τα 1000, τυπώνεται 150g.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/12-neo-ston-katalogo.png" alt="Το Galaxy μέσα στον κατάλογο">
+    <figcaption>Εικόνα 12. Το νέο προϊόν εμφανίζεται στην προβολή καταλόγου.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">11</div>
+    <div>
+      <div class="kicker">Πριν από την επιλογή 7</div>
+      <h2>Το καλάθι που οδηγεί στην αγορά</h2>
+    </div>
+  </div>
+  <div class="note">
+    Ανάμεσα στην εκκένωση και στην ολοκλήρωση, ο χρήστης ξαναχρησιμοποίησε την επιλογή 2.
+    Στο καλάθι μπήκαν ένα Samsung Galaxy S25 Ultra και ένα Lenovo ThinkPad T70.
+    Δεν υπάρχει ξεχωριστό στιγμιότυπο γι’ αυτή την προσθήκη. Φαίνεται από την οθόνη της αγοράς,
+    που είναι το επόμενο βήμα, και από το ιστορικό που καταγράφει ακριβώς αυτά τα δύο τεμάχια.
+  </div>
+  <p>Οι συναρτήσεις είναι οι ίδιες με τα βήματα 3 και 4: <span class="mono">add_product_to_cart</span>, <span class="mono">showCartCatalog</span>, <span class="mono">Cart.addProduct</span> και <span class="mono">Cart.getTotalPrice</span>. Το άθροισμα πριν από οποιαδήποτε έκπτωση είναι 1.900 + 2.300 = 4.200 €.</p>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">12</div>
+    <div>
+      <div class="kicker">Επιλογή 7</div>
+      <h2>Ολοκλήρωση αγοράς και εκπτώσεις κατηγορίας</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:
+Do you wish to use a promo Code? 'Yes/No':</div>
+  <p>
+    Πριν από την ερώτηση τυπώνει τα προϊόντα, την έκπτωση του καθενός, το ενδιάμεσο σύνολο
+    και την απόφαση για τα μεταφορικά. Στο παράδειγμα η γραμμή των μεταφορικών είναι
+    <span class="mono">No delivery cost (Cart total over 1,000€)</span>.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="math">
+    Αρχικό σύνολο: 1.900,00 + 2.300,00 = <strong>4.200,00 €</strong>.<br>
+    Galaxy, Electronics 10%: μείωση 190,00 €, νέο σύνολο <strong>4.010,00 €</strong>.<br>
+    ThinkPad, Electronics 10%: μείωση 230,00 €, νέο σύνολο <strong>3.780,00 €</strong>.<br>
+    Το 3.780 είναι πάνω από 1.000, άρα μεταφορικά <strong>0 €</strong>.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 7.</td></tr>
+      <tr><td>Orders.checkout</td><td>Συντονίζει την προβολή, τις εκπτώσεις, τα μεταφορικά και τις ερωτήσεις του χρήστη.</td></tr>
+      <tr><td>Cart.showCart</td><td>Τυπώνει τα δύο προϊόντα, την ποσότητα 1 και τις τιμές 1.900,00 € και 2.300,00 €.</td></tr>
+      <tr><td>Cart.getTotalPrice</td><td>Δίνει το αρχικό σύνολο, 4200, πάνω στο οποίο εφαρμόζονται μετά οι μειώσεις.</td></tr>
+      <tr><td>Orders.getDiscount</td><td>Βρίσκει το ποσοστό της κατηγορίας. Για Electronics επιστρέφει 10.</td></tr>
+      <tr><td>Product.getCategory / getPrice / getName / getWeight</td><td>Δίνουν τα στοιχεία που χρειάζονται το μήνυμα της έκπτωσης και ο υπολογισμός των μεταφορικών.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">
+    Τα μεταφορικά, πριν μηδενιστούν, θα ήταν το βάρος κάθε τεμαχίου σε κιλά επί 0,95.
+    Εδώ η συνθήκη του συνόλου τα κάνει 0 και τυπώνεται το αντίστοιχο μήνυμα.
+  </p>
+  <figure class="shot">
+    <img src="../screenshots/13-checkout.png" alt="Εκπτώσεις ηλεκτρονικών και ερώτηση για κωδικό">
+    <figcaption>Εικόνα 13. Οι δύο μειώσεις του 10% και η ερώτηση για κωδικό προσφοράς.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">13</div>
+    <div>
+      <div class="kicker">Επιλογή 7, συνέχεια</div>
+      <h2>Εισαγωγή κωδικού προσφοράς</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Do you wish to use a promo Code? 'Yes/No':
+Please enter a valid promo code (Input 'checkout' if you don't wish to use a code):</div>
+  <p>
+    Αν ο κωδικός δεν υπάρχει, η ερώτηση επαναλαμβάνεται:
+    <span class="mono">Promo code doesn't exist Please enter a valid promo code:</span>.
+    Η λέξη <span class="mono">checkout</span> σταματά την αναζήτηση και η αγορά συνεχίζει χωρίς έκπτωση κωδικού.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Στην πρώτη ερώτηση δόθηκε <strong>yes</strong>. Στη δεύτερη δόθηκε ο κωδικός <strong>M3T4M0RF0S1</strong>.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Orders.checkout</td><td>Διαβάζει την απάντηση Yes/No και, επειδή είναι καταφατική, ανοίγει την εισαγωγή του κωδικού.</td></tr>
+      <tr><td>Orders.checkPromo</td><td>Συγκρίνει το κείμενο με τους αποθηκευμένους κωδικούς, χωρίς διάκριση κεφαλαίων. Για τον M3T4M0RF0S1 επιστρέφει true και ο βρόχος σταματά.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/14-promo.png" alt="Πληκτρολόγηση του κωδικού M3T4M0RF0S1">
+    <figcaption>Εικόνα 14. Η ερώτηση του κωδικού και η τιμή που δόθηκε.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">14</div>
+    <div>
+      <div class="kicker">Επιλογή 7, καταχώριση</div>
+      <h2>Αποδοχή κωδικού και επιβεβαίωση αγοράς</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Continue with checkout? (Yes/No):</div>
+  <p>
+    Πριν από την ερώτηση τυπώνει <span class="mono">Valid code!</span>, τον κωδικό με κεφαλαία,
+    την έκπτωση και το νέο σύνολο. Με <span class="mono">Yes</span> η αγορά καταχωρίζεται και το καλάθι αδειάζει.
+    Με οποιαδήποτε άλλη απάντηση δεν δημιουργείται εγγραφή ιστορικού.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="math">
+    Η getPromo επιστρέφει 15. Η checkout διαιρεί το ποσό μετά τις εκπτώσεις κατηγορίας με
+    (100 + 15) / 100, δηλαδή με 1,15, και στρογγυλοποιεί σε δύο δεκαδικά:<br>
+    3.780,00 / 1,15 = <strong>3.286,96 €</strong>.<br>
+    Τα μεταφορικά είναι 0, άρα αυτό είναι και το τελικό ποσό της οθόνης.
+    Στην ερώτηση συνέχειας δόθηκε <strong>Yes</strong>.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Orders.getPromo</td><td>Βρίσκει τη θέση του κωδικού στον πίνακα και επιστρέφει το αντίστοιχο ποσοστό, 15.</td></tr>
+      <tr><td>Orders.checkout</td><td>Εφαρμόζει τη διαίρεση, τυπώνει το νέο σύνολο και διαβάζει την τελική επιβεβαίωση.</td></tr>
+      <tr><td>new History</td><td>Με το Yes δημιουργεί την εγγραφή: αντίγραφο καλαθιού, ποσό 3286.96 και ημερομηνία σε μορφή ηη/μμ/εεεε.</td></tr>
+      <tr><td>Cart.copy</td><td>Την καλεί ο κατασκευαστής της History, ώστε η εγγραφή να κρατήσει τα προϊόντα και μετά το άδειασμα του καλαθιού.</td></tr>
+      <tr><td>Cart.getCart().clear</td><td>Αδειάζει το τρέχον καλάθι. Η αγορά μένει μόνο στο ιστορικό.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/15-promo-egkyro.png" alt="Έγκυρος κωδικός και νέο σύνολο 3.286,96 ευρώ">
+    <figcaption>Εικόνα 15. Ο κωδικός έγινε δεκτός. Το νέο σύνολο είναι 3.286,96 € και ζητείται συνέχεια.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">15</div>
+    <div>
+      <div class="kicker">Επιλογή 8</div>
+      <h2>Προβολή ιστορικού αγορών</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>
+    Δεν κάνει άλλη ερώτηση. Αν δεν υπήρχε καμία αγορά, θα τύπωνε
+    <span class="mono">No purchases yet.</span> και θα επέστρεφε στο μενού.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Δόθηκε η επιλογή <strong>8</strong>. Εμφανίζεται η αγορά με αριθμό 1 και ημερομηνία <strong>20/11/2026</strong>.
+    Μέσα της φαίνονται τα δύο προϊόντα, το αρχικό σύνολο 4.200,00 € και, χωριστά,
+    το ποσό μετά τις εκπτώσεις: <strong>3.286,96 €</strong>.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 8.</td></tr>
+      <tr><td>Orders.showHistory</td><td>Διατρέχει τις εγγραφές και για καθεμία τυπώνει αριθμό, ημερομηνία, προϊόντα και τελικό ποσό.</td></tr>
+      <tr><td>History.showDate</td><td>Τυπώνει τη γραμμή Date of transaction με την αποθηκευμένη ημερομηνία.</td></tr>
+      <tr><td>History.getCart</td><td>Επιστρέφει το αντίγραφο του καλαθιού εκείνης της αγοράς.</td></tr>
+      <tr><td>Cart.showCart</td><td>Τυπώνει τα προϊόντα του αντιγράφου. Γι’ αυτό φαίνονται ακόμη, παρότι το τρέχον καλάθι έχει αδειάσει.</td></tr>
+      <tr><td>History.getPurchaseCost</td><td>Επιστρέφει το 3286.96, που τυπώνεται ως Total price after discounts.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/16-istoriko.png" alt="Ιστορικό της αγοράς">
+    <figcaption>Εικόνα 16. Η αγορά 1, όπως την τυπώνει η επιλογή 8.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">16</div>
+    <div>
+      <div class="kicker">Επιλογή 9</div>
+      <h2>Στοιχεία εταιρείας</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>Δεν ζητάει άλλα στοιχεία. Η επιλογή 9 μόνο εμφανίζει τα σταθερά στοιχεία της εταιρείας και επιστρέφει στο μενού.</p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">Δόθηκε η επιλογή <strong>9</strong>. Η οθόνη δείχνει την επωνυμία NEXT LEVEL SHOPPING SOLUTIONS SMPC, τη δραστηριότητα, το ΑΦΜ EL090000045, τη ΔΟΥ, τη διεύθυνση στη λεωφόρο Βουλιαγμένης, το τηλέφωνο και το email info@nlss.gr.</div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Στην περίπτωση 9 τυπώνει η ίδια τα πεδία της εταιρείας. Δεν καλείται ξεχωριστή συνάρτηση προβολής.</td></tr>
+    </tbody>
+  </table>
+  <p>Τα πεδία που τυπώνονται, με τη σειρά της οθόνης, είναι τα εξής.</p>
+  <table class="small">
+    <thead><tr><th>Πεδίο</th><th>Τιμή που εμφανίζεται</th></tr></thead>
+    <tbody>
+      <tr><td>companyName</td><td>NEXT LEVEL SHOPPING SOLUTIONS SMPC</td></tr>
+      <tr><td>activity</td><td>Retail Sale of Computers, Electronics &amp; Consumer Goods via Internet (NACE 47.91)</td></tr>
+      <tr><td>vat</td><td>EL090000045</td></tr>
+      <tr><td>taxOffice</td><td>KEFODE Attikis (Attica Tax Operations Center)</td></tr>
+      <tr><td>adress</td><td>328 Vouliagmenis Avenue, Agios Dimitrios, 173 43, Athens, Greece</td></tr>
+      <tr><td>tel</td><td>+30 210 000 0000</td></tr>
+      <tr><td>mail</td><td>info@nlss.gr</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/17-etaireia.png" alt="Στοιχεία εταιρείας">
+    <figcaption>Εικόνα 17. Η επιλογή 9 και τα στοιχεία που τυπώνει.</figcaption>
+  </figure>
+</section>
+
+<section class="step">
+  <div class="step-head">
+    <div class="num">17</div>
+    <div>
+      <div class="kicker">Επιλογή 10</div>
+      <h2>Αποθήκευση και έξοδος</h2>
+    </div>
+  </div>
+  <h3>Τι ζητάει το πρόγραμμα</h3>
+  <div class="prompt">Input an option:</div>
+  <p>
+    Με το 10 δεν κάνει άλλη ερώτηση. Τυπώνει <span class="mono">NLSS log: Saving data...</span>,
+    γράφει τα τρία αρχεία, αναφέρει τη διαδρομή του καθενός και τερματίζει τον βρόχο του μενού.
+  </p>
+  <h3>Τι έγινε στο παράδειγμα</h3>
+  <div class="did">
+    Δόθηκε η επιλογή <strong>10</strong>. Αποθηκεύτηκαν το καλάθι, το ιστορικό και ο κατάλογος.
+    Το καλάθι είχε αδειάσει στο βήμα 14, άρα το αρχείο του δεν έχει γραμμές προϊόντων.
+    Το ιστορικό κρατά την αγορά των 3.286,96 € και ο κατάλογος κρατά και το Galaxy που δημιουργήθηκε.
+  </div>
+  <h3>Συναρτήσεις</h3>
+  <table>
+    <thead><tr><th>Συνάρτηση</th><th>Τι κάνει σε αυτό το βήμα</th></tr></thead>
+    <tbody>
+      <tr><td>Main.showMenu</td><td>Αναγνωρίζει την επιλογή 10, τυπώνει το μήνυμα αποθήκευσης και μετά κλείνει τον βρόχο.</td></tr>
+      <tr><td>Cart.saveCart</td><td>Γράφει στο Data/cartLog.txt έναν κωδικό ανά γραμμή, για κάθε τεμάχιο που έχει μείνει στο καλάθι.</td></tr>
+      <tr><td>Orders.saveHistory</td><td>Γράφει κάθε αγορά στο Data/historyLog.txt και, σε μορφή κειμένου για ανάγνωση, στο Logs/historyLog.txt.</td></tr>
+      <tr><td>History.getDate</td><td>Δίνει την ημερομηνία που γράφεται πρώτη γραμμή της αγοράς.</td></tr>
+      <tr><td>History.getCart / Cart.getAmount</td><td>Δίνουν τα προϊόντα και την ποσότητα κάθε κωδικού, ώστε το αρχείο να γράψει ζεύγη κωδικού και ποσότητας.</td></tr>
+      <tr><td>History.getPurchaseCost</td><td>Δίνει το τελικό ποσό που γράφεται μετά τη γραμμή __OUT__.</td></tr>
+      <tr><td>Catalog.saveCatalog</td><td>Ξαναγράφει το Data/catalog.txt. Για κάθε προϊόν γράφει __New_Item__, όνομα, αριθμό κατηγορίας, βάρος και τιμή.</td></tr>
+      <tr><td>Product.getName / getCategory / getWeight / getPrice</td><td>Δίνουν τα τέσσερα στοιχεία που γράφει η saveCatalog.</td></tr>
+    </tbody>
+  </table>
+  <figure class="shot">
+    <img src="../screenshots/18-eksodos.png" alt="Μηνύματα επιτυχούς αποθήκευσης">
+    <figcaption>Εικόνα 18. Τα τρία μηνύματα επιτυχούς αποθήκευσης και ο τερματισμός του προγράμματος.</figcaption>
+  </figure>
+</section>
+
+<section class="page">
+  <h2 class="sec">Τι έμεινε στα αρχεία</h2>
+  <p>
+    Η έξοδος είναι το σημείο όπου η εκτέλεση γίνεται μόνιμη. Στην επόμενη εκκίνηση
+    η <span class="mono">restoreCatalog</span>, η <span class="mono">restoreHistory</span> και η
+    <span class="mono">restoreCart</span> διαβάζουν ακριβώς αυτά που έγραψε η επιλογή 10.
+  </p>
+  <h3>Data/historyLog.txt</h3>
+  <div class="prompt">20/11/2026
+20
+1
+6
+1
+__OUT__
+3286.96</div>
+  <p>
+    Η ημερομηνία είναι της αγοράς. Ο κωδικός 20 με ποσότητα 1 είναι το Samsung Galaxy S25 Ultra.
+    Ο κωδικός 6 με ποσότητα 1 είναι το Lenovo ThinkPad T70.
+    Το 3286.96 είναι το ποσό που υπολόγισε η <span class="mono">checkout</span> και επέστρεψε η
+    <span class="mono">getPurchaseCost</span>.
+  </p>
+  <h3>Logs/historyLog.txt</h3>
+  <p>
+    Το ίδιο γεγονός, σε μορφή που διαβάζεται χωρίς να γνωρίζει κανείς τη δομή του αρχείου δεδομένων:
+    ημερομηνία, όνομα, τιμή μονάδας, ποσότητα και τελικό σύνολο. Αυτό το αρχείο το γράφει πάλι η
+    <span class="mono">saveHistory</span>, στο δεύτερο πέρασμά της.
+  </p>
+  <h3>Data/cartLog.txt</h3>
+  <p>
+    Το αρχείο μένει χωρίς προϊόντα. Η <span class="mono">checkout</span> καθάρισε το καλάθι μόλις
+    ο χρήστης επιβεβαίωσε την αγορά, και η <span class="mono">saveCart</span> δεν είχε τεμάχια να γράψει.
+  </p>
+  <h3>Data/catalog.txt</h3>
+  <p>
+    Ο κατάλογος κλείνει με το προϊόν που δημιουργήθηκε στο βήμα 9. Η <span class="mono">saveCatalog</span>
+    γράφει τον δείκτη κατηγορίας, όχι το όνομά της. Το Electronics είναι η θέση 1.
+  </p>
+  <div class="prompt">__New_Item__
+Samsung Galaxy S25 Ultra
+1
+150.0
+1900.0</div>
+</section>
+
+<section class="page">
+  <h2 class="sec">Συγκεντρωτικός πίνακας συναρτήσεων</h2>
+  <p>Οι συναρτήσεις με τη σειρά που εμφανίζονται στον κώδικα. Στα προηγούμενα βήματα φαίνεται πού καλείται η καθεμιά.</p>
+  <table class="small">
+    <thead><tr><th>Συνάρτηση</th><th>Συνοπτικά</th></tr></thead>
+    <tbody>
+      <tr><td>History.showDate</td><td>Τυπώνει την ημερομηνία μιας αγοράς.</td></tr>
+      <tr><td>History.getDate</td><td>Επιστρέφει την ημερομηνία ως κείμενο.</td></tr>
+      <tr><td>History.getCart</td><td>Επιστρέφει το καλάθι που αποθηκεύτηκε με την αγορά.</td></tr>
+      <tr><td>History.getPurchaseCost</td><td>Επιστρέφει το τελικό ποσό, στρογγυλοποιημένο σε δύο δεκαδικά.</td></tr>
+      <tr><td>Product.assignCategory / assignName / assignWeight / assignPrice</td><td>Αλλάζουν το αντίστοιχο πεδίο ενός προϊόντος.</td></tr>
+      <tr><td>Product.getName / getCategory / getWeight / getPrice / getId</td><td>Επιστρέφουν το αντίστοιχο πεδίο.</td></tr>
+      <tr><td>Catalog.showCatalog</td><td>Προβάλλει τον κατάλογο, με ή χωρίς κωδικούς.</td></tr>
+      <tr><td>Catalog.showCartCatalog</td><td>Προβάλλει κατάλογο μαζί με την ποσότητα στο καλάθι.</td></tr>
+      <tr><td>Catalog.restoreCatalog</td><td>Φορτώνει τα προϊόντα από αρχείο.</td></tr>
+      <tr><td>Catalog.saveCatalog</td><td>Αποθηκεύει τα προϊόντα σε αρχείο.</td></tr>
+      <tr><td>Catalog.getProducts</td><td>Επιστρέφει τη λίστα των προϊόντων.</td></tr>
+      <tr><td>Catalog.addProduct</td><td>Προσθέτει προϊόν στη λίστα του καταλόγου.</td></tr>
+      <tr><td>Cart.addProduct</td><td>Προσθέτει ποσότητα ενός κωδικού στο καλάθι.</td></tr>
+      <tr><td>Cart.removeProduct</td><td>Αφαιρεί ποσότητα ενός κωδικού από το καλάθι.</td></tr>
+      <tr><td>Cart.getCart</td><td>Επιστρέφει τη λίστα των τεμαχίων.</td></tr>
+      <tr><td>Cart.copy</td><td>Επιστρέφει ανεξάρτητο αντίγραφο του καλαθιού.</td></tr>
+      <tr><td>Cart.getTotalPrice</td><td>Υπολογίζει το άθροισμα των τιμών.</td></tr>
+      <tr><td>Cart.getAmount</td><td>Μετρά τα τεμάχια ενός κωδικού.</td></tr>
+      <tr><td>Cart.showCart</td><td>Τυπώνει το καλάθι και το σύνολο.</td></tr>
+      <tr><td>Cart.saveCart</td><td>Γράφει τους κωδικούς του καλαθιού σε αρχείο.</td></tr>
+      <tr><td>Cart.restoreCart</td><td>Ξαναφτιάχνει το καλάθι από αρχείο.</td></tr>
+      <tr><td>Cart.clearCart</td><td>Ζητά επιβεβαίωση και αδειάζει το καλάθι.</td></tr>
+      <tr><td>Orders.getDiscount</td><td>Επιστρέφει το ποσοστό μιας κατηγορίας.</td></tr>
+      <tr><td>Orders.checkPromo</td><td>Ελέγχει αν ένας κωδικός προσφοράς είναι έγκυρος.</td></tr>
+      <tr><td>Orders.getPromo</td><td>Επιστρέφει το ποσοστό ενός έγκυρου κωδικού.</td></tr>
+      <tr><td>Orders.checkout</td><td>Εκτελεί την ολοκλήρωση της αγοράς.</td></tr>
+      <tr><td>Orders.showHistory</td><td>Τυπώνει το ιστορικό αγορών.</td></tr>
+      <tr><td>Orders.restoreHistory</td><td>Φορτώνει το ιστορικό από αρχείο.</td></tr>
+      <tr><td>Orders.saveHistory</td><td>Αποθηκεύει το ιστορικό σε αρχείο δεδομένων και σε αρχείο ανάγνωσης.</td></tr>
+      <tr><td>Main.add_product_to_cart</td><td>Διάλογος προσθήκης στο καλάθι.</td></tr>
+      <tr><td>Main.add_product_to_catalog</td><td>Διάλογος δημιουργίας προϊόντος.</td></tr>
+      <tr><td>Main.remove_product_from_cart</td><td>Διάλογος αφαίρεσης από το καλάθι.</td></tr>
+      <tr><td>Main.showMenu</td><td>Μενού, επιλογές και αποθήκευση κατά την έξοδο.</td></tr>
+      <tr><td>Main.main</td><td>Σημείο εκκίνησης της εφαρμογής.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+</body>
+</html>
